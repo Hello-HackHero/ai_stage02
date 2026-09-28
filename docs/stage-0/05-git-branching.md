@@ -1,46 +1,54 @@
 # Chapter 05 — Branching and Merging
 
-> Stage 0 / 10 | Hinglish study chapter | Git branches | 28 Sep 2026
+> Stage 0 / 10 | Hinglish study chapter | Git branches, merge, conflicts | 28 Sep 2026
 
 ## Goal
 
-Branch kyun hota hai, local branching workflow, aur safe merge patterns ko samajhna.
+Branches ko parallel timeline samajhna, safe branching workflow, aur local merge ka basic flow.
 
-## 1. Branch mental model
+## 1. Branch kya hai?
 
-Branch = pointer to a commit. `master`/`main` default branch hota hai. Nayi branch se tum parallel line of work banate ho bina main code ko touch kiye.
+Branch = commits ki ek independent line. `master` default branch hoti hai (ya `main`). Nayi branch current commit se start hoti hai; uspar naye commits `master` ko affect nahi karte jab tak merge na ho.
 
-- `git branch` — local branches list; `*` current branch.
-- `git branch -a` — local + remote-tracking branches.
-- `git switch -c feature-login` — new branch banao aur switch karo.
-- `git switch master` — existing branch par switch.
-
-Older equivalent: `git checkout -b feature-login`; `git checkout master`.
-
-## 2. Safe branching workflow
+## 2. Core commands
 
 ```bash
-git switch master
-git pull origin master      # upstream se fresh
-git switch -c feature-login # new branch
-# edit files
-git status
-git add .
-git commit -m "feat: add login form"
-git switch master
-git merge feature-login     # local merge
+git branch                 # local branches; * current
+git branch -a              # local + remote-tracking
+git switch -c feature-x    # new branch + switch
+git switch master          # existing branch par switch
+git merge feature-x        # current branch mein feature merge
+git branch -d feature-x    # merged branch delete
+git branch -D feature-x    # force delete (unmerged work lose ho sakta)
 ```
 
-`git merge` current branch mein specified branch ke commits combine karta hai. Fast-forward merge tab hota hai jab target branch sirf aage badha hai; three-way merge tab jab dono branches par alag changes hain.
+Older: `git checkout -b feature-x`; `git checkout master`. `git switch` clearer hai.
 
-## 3. Common mistakes
+## 3. Safe branching workflow
 
-- Bina `git status` branch switch karna: uncommitted changes carry ho sakte hain.
-- `git checkout -b` se pehle current branch check nahi karna.
-- Merge se pehle test na karna.
+1. `git status` — clean working tree?
+2. `git switch master`
+3. `git pull` (agar remote sync chahiye)
+4. `git switch -c feature-x`
+5. Edits → `git add` → `git commit`
+6. `git switch master`
+7. `git merge feature-x`
 
-## 4. Exit gate
+Branch switch se pehle `git status` check karo; uncommitted edits carry ho sakte hain.
 
-Fresh folder: `master` par do commits, `feature-x` par ek commit, `master` par wapas aakar merge, `git log --oneline --graph` se history dekho. Agar tum fast-forward vs three-way merge explain kar sakte ho, toh Chapter 06 ke liye ready ho.
+## 4. Common mistakes
 
-**Reference:** [Git branching docs](https://git-scm.com/docs/git-branch)
+- Galat branch par commit: `git log --oneline --decorate -3` se verify karo.
+- `-D` blindly use: pehle `git branch --merged` dekho.
+- Merge se pehle tests/formatting skip karna.
+
+## 5. Mini exercise
+
+- `feature-login` branch banao, ek file add karo, commit karo.
+- `master` par wapas aakar merge karo, phir branch delete karo.
+
+## 6. Exit gate
+
+Bina notes: new branch banao, commit karo, `master` par merge karo, branch delete karo, aur har step par `git branch`/`git log` se state verify karo.
+
+**References:** [Git Branching](https://git-scm.com/book/en/v2/Git-Branching) · [Atlassian: Merging vs Rebasing](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
